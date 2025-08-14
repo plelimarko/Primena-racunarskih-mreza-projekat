@@ -45,7 +45,8 @@
   <ItemGroup>
     <Compile Include="CitanjePoruka\TcpCitanje.cs" />
     <Compile Include="CitanjePoruka\UdpCitanje.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="PisanjePoruka\TcpPisanje.cs" />
+    <Compile Include="PisanjePoruka\UdpPisanje.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
