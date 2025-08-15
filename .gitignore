@@ -14,3 +14,7 @@
 /.gitignore
 /.gitignore
 /.gitignore
+/Klijent/Domain/bin/Debug
+/Klijent/Klijent/bin/Debug
+/Klijent/Server/bin/Debug
+/Klijent/Services/bin/Debug

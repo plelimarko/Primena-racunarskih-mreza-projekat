@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-
-namespace Services.PisanjePoruka
+namespace Services.SlanjePoruka
 {
-    internal class UdpPisanje
+    public class UdpPisanje
     {
         public bool PosaljiPoruku(Socket socket, string poruka, EndPoint primaocEP)
         {
