@@ -16,27 +16,42 @@ namespace Klijent
 
         static void Main(string[] args)
         {
+            #region inicijalizacija
             Socket tcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint serverEP = new IPEndPoint(IPAddress.Loopback, 50250);
+            EndPoint serverEndPoint = (EndPoint)serverEP;
 
-           string poruka=Console.ReadLine();
-           UdpPisanje udpPisanje = new UdpPisanje();
-           bool poslato = udpPisanje.PosaljiPoruku(udpSocket, poruka, serverEP);
-            if (poslato)
+
+            UdpPisanje udpPisanje = new UdpPisanje();
+            UdpCitanje udpCitanje = new UdpCitanje();
+            #endregion
+
+            #region prijava
+            string poruka;
+            Console.WriteLine("Prijavite se na server:[PRIJAVA:ime, niz igara koje zelite da igrate]");
+            while (true)
             {
-                Console.WriteLine("Poruka je poslata preko UDP protokola.");
+                
+
+                poruka = Console.ReadLine();
+                udpPisanje.PosaljiPoruku(udpSocket, poruka, serverEP);
+                string poruka2 = udpCitanje.ProcitajPoruku(udpSocket, ref serverEndPoint); 
+                Console.WriteLine(poruka2);
+                if (poruka2.Contains("GRESKA"))
+                {
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+                
             }
-            else
-            {
-                Console.WriteLine("Doslo je do greske prilikom slanja poruke preko UDP protokola.");
-            }
+            #endregion
 
-                tcpSocket.Close();
-                udpSocket.Close();
-
-
-
+            tcpSocket.Close();
+            udpSocket.Close();
 
         }
     }
