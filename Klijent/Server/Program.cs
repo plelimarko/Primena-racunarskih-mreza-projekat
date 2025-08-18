@@ -23,7 +23,9 @@ namespace Server {
             Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             EndPoint posiljaocEP = new IPEndPoint(IPAddress.Any, 0);
             IPEndPoint serverEP = new IPEndPoint(IPAddress.Any, 50250);
-           
+           IPEndPoint serverTCPEP = new IPEndPoint(IPAddress.Loopback, 50150);
+
+
             udpSocket.Bind(serverEP);
 
            
@@ -39,11 +41,15 @@ namespace Server {
             string odgovor;
             Igrac igrac = null;
             bool kraj = false;
-            
+            string poruka;
+            string[] delovi;
+            string[] igre = null; 
+
             while (true)
             {
-                string poruka = udpCitanje.ProcitajPoruku(udpSocket, ref posiljaocEP);
+                poruka = udpCitanje.ProcitajPoruku(udpSocket, ref posiljaocEP);
                 Console.WriteLine(poruka);
+                
                 if (!poruka.StartsWith("PRIJAVA:"))
                 {
                     odgovor = "GRESKA: Pogresan format poruke. Ocekivano: PRIJAVA:ime, niz igara koje zelite da igrate";
@@ -51,7 +57,7 @@ namespace Server {
                 else
                 {
                     string ostatak = poruka.Substring("PRIJAVA:".Length).Trim();
-                    string[] delovi = ostatak.Split(',');
+                    delovi = ostatak.Split(',');
                     if (delovi.Length < 2)
                     {
                         odgovor = "GRESKA: Pogresan format poruke. Ocekivano: PRIJAVA:ime, niz igara koje zelite da igrate";
@@ -64,7 +70,7 @@ namespace Server {
                     {
 
                         string ime = delovi[0];
-                        string[] igre = delovi.Skip(1).Select(i => i.ToLower()).ToArray();
+                        igre = delovi.Skip(1).Select(i => i.ToLower().Trim()).ToArray();
 
                         if (!igre.All(i => dozvoljeno.Contains(i)))
                         {
@@ -76,8 +82,8 @@ namespace Server {
                         }
                         else
                         {
-                            // sve je validno
-                            odgovor = "TCP: 127.0.0.1;5050";
+                            string endpoint= serverTCPEP.ToString();
+                            odgovor = $"TCP: {endpoint}";
                             Console.WriteLine($"Igrač {ime}, igre: {string.Join(",", igre)}");
                             var random = new Random();
                             int id = random.Next(1000, 9999);
@@ -98,7 +104,60 @@ namespace Server {
                 }
             }
             #endregion
-        
+
+            #region povezivanje na TCP
+            tcpSocket.Bind(serverTCPEP);
+            tcpSocket.Listen(1);
+            Socket acceptedsocket = tcpSocket.Accept();
+            Console.WriteLine("TCP konekcija uspostavljena.");
+            tcpPisanje.PosaljiPoruku(acceptedsocket, $"Dobrodošli u trening igru kviza TV Slagalica, današnji takmičar je {igrac.Name}");
+            tcpPisanje.PosaljiPoruku(acceptedsocket, "Posaljite poruku SPREMAN da zapocnete kviz");
+
+            while (true)
+            {
+                string spreman = tcpCitanje.ProcitajPoruku(acceptedsocket);
+                if (spreman.ToUpper() == "SPREMAN")
+                {
+                    Console.WriteLine("Igrač je spreman, započinjemo igru.");
+                    break;
+                }
+                else
+                {
+                    tcpPisanje.PosaljiPoruku(acceptedsocket, "GRESKA: Niste poslali SPREMAN, pokušajte ponovo.");
+                }
+
+            }
+            #endregion
+
+
+            if (igre.Contains("sl"))
+            {
+                
+                
+
+                Slagalica slagalica = new Slagalica();
+                slagalica.GenerišiSlova();
+                tcpPisanje.PosaljiPoruku(acceptedsocket,$"Ponuđena slova: {slagalica.PonuđenaSlova}");
+               
+
+                string resenje = tcpCitanje.ProcitajPoruku(acceptedsocket);
+                Console.WriteLine($"Igrač je poslao reč: {resenje}");
+                slagalica.SastavljenaReč = resenje;
+                int poeni = slagalica.ProveriReč();
+                if(poeni > 0)
+                {
+                    igrac.niz[0] = poeni;
+                    tcpPisanje.PosaljiPoruku(acceptedsocket, $"Čestitamo! Osvojili ste {poeni} poena.");
+                }
+                else
+                {
+                    igrac.niz[0] = 0;
+                    tcpPisanje.PosaljiPoruku(acceptedsocket, "Nažalost, reč nije validna. Niste osvojili poene.");
+                }
+            }
+
+
+
             Console.ReadLine();
             tcpSocket.Close();
             udpSocket.Close();

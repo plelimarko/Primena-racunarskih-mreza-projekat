@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
 
 
 namespace Services.CitanjePoruka
@@ -25,4 +26,6 @@ namespace Services.CitanjePoruka
             return poruka;
         }
     }
+
 }
+

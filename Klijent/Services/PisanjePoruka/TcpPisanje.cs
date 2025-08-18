@@ -4,24 +4,28 @@ using System.Net.Sockets;
 
 namespace Services.PisanjePoruka
 {
+
     public class TcpPisanje
     {
-        public bool PosaljiPoruku(Socket socket, string poruka)
-        {
-            bool poslato;
-            byte[] binarnaPoruka = Encoding.UTF8.GetBytes(poruka);
-
-            try
+        
+            public bool PosaljiPoruku(Socket socket, string poruka)
             {
-                socket.Send(binarnaPoruka, 0, binarnaPoruka.Length, SocketFlags.None);
-                poslato = true;
-            }
-            catch (Exception)
-            {
-                poslato= false;
-            }
+                bool isSent;
+                byte[] binarnaPoruka = Encoding.UTF8.GetBytes(poruka);
 
-            return poslato;
+                try
+                {
+                    socket.Send(binarnaPoruka, 0, binarnaPoruka.Length, SocketFlags.None);
+                    isSent = true;
+                }
+                catch (Exception)
+                {
+                    isSent = false;
+                }
+
+                return isSent;
+            }
         }
     }
-}
+
+

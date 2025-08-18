@@ -21,14 +21,16 @@ namespace Klijent
             Socket udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint serverEP = new IPEndPoint(IPAddress.Loopback, 50250);
             EndPoint serverEndPoint = (EndPoint)serverEP;
-
-
+            
+            TcpCitanje tcpCitanje = new TcpCitanje();
+            TcpPisanje tcpPisanje = new TcpPisanje();
             UdpPisanje udpPisanje = new UdpPisanje();
             UdpCitanje udpCitanje = new UdpCitanje();
             #endregion
 
             #region prijava
             string poruka;
+            string poruka2;
             Console.WriteLine("Prijavite se na server:[PRIJAVA:ime, niz igara koje zelite da igrate]");
             while (true)
             {
@@ -36,7 +38,8 @@ namespace Klijent
 
                 poruka = Console.ReadLine();
                 udpPisanje.PosaljiPoruku(udpSocket, poruka, serverEP);
-                string poruka2 = udpCitanje.ProcitajPoruku(udpSocket, ref serverEndPoint); 
+                
+                poruka2 = udpCitanje.ProcitajPoruku(udpSocket, ref serverEndPoint); 
                 Console.WriteLine(poruka2);
                 if (poruka2.Contains("GRESKA"))
                 {
@@ -48,7 +51,60 @@ namespace Klijent
                 }
                 
             }
+            poruka=poruka.Substring("PRIJAVA:".Length).Trim();
+            string [] delovi2 = poruka.Split(',');
+            string[] igre = delovi2.Skip(1).Select(i => i.ToLower().Trim()).ToArray();
             #endregion
+
+
+            #region povezivanje na TCP server
+            string[] delovi=poruka2.Split(':');
+            IPEndPoint serverTCPEP = new IPEndPoint(IPAddress.Parse(delovi[1].Trim()), int.Parse(delovi[2]));
+            tcpSocket.Connect(serverTCPEP);
+            Console.WriteLine($"Uspesno ste se povezali na server TCP na adresi {serverTCPEP.Address} i portu {serverTCPEP.Port}");
+            string poruka3= tcpCitanje.ProcitajPoruku(tcpSocket);
+            Console.WriteLine(poruka3);
+            string poruka4 = tcpCitanje.ProcitajPoruku(tcpSocket);
+            Console.WriteLine(poruka4);
+
+            while (true)
+            {
+                
+                string spreman= Console.ReadLine();
+                tcpPisanje.PosaljiPoruku(tcpSocket, spreman);
+                string odgovor = tcpCitanje.ProcitajPoruku(tcpSocket);
+                if (odgovor.Contains("GRESKA"))
+                {
+                    Console.WriteLine(odgovor);
+                    continue;
+                }
+              
+                else
+                {
+                    Console.WriteLine(odgovor);
+                    break;
+                }
+            }
+            #endregion
+
+
+            if(delovi2.Contains("sl"))
+            {
+                string p1, p3;
+                string porukaSlagalica = "Dobrodošli u igru Slagalica! Potrebno je od ponudjenih slova sklopiti najduzu mogucu rec";
+                Console.WriteLine(porukaSlagalica);
+                
+                p1=tcpCitanje.ProcitajPoruku(tcpSocket);
+                Console.WriteLine(p1);
+                string res= Console.ReadLine();
+                tcpPisanje.PosaljiPoruku(tcpSocket, res);
+
+                p3= tcpCitanje.ProcitajPoruku(tcpSocket);
+                Console.WriteLine(p3);
+            }
+
+
+            Console.ReadLine();
 
             tcpSocket.Close();
             udpSocket.Close();
