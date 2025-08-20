@@ -28,6 +28,7 @@ namespace Klijent
             UdpCitanje udpCitanje = new UdpCitanje();
             #endregion
 
+
             #region prijava
             string poruka;
             string poruka2;
@@ -88,7 +89,10 @@ namespace Klijent
             #endregion
 
 
-            if(delovi2.Contains("sl"))
+            #region slagalica
+
+           
+            if (igre.Contains("sl"))
             {
                 string p1, p3;
                 string porukaSlagalica = "Dobrodošli u igru Slagalica! Potrebno je od ponudjenih slova sklopiti najduzu mogucu rec";
@@ -102,12 +106,74 @@ namespace Klijent
                 p3= tcpCitanje.ProcitajPoruku(tcpSocket);
                 Console.WriteLine(p3);
             }
+            #endregion
 
+
+            #region skocko
+            if (igre.Contains("sk"))
+            {
+                string p1, p2;
+                string porukaSkocko = "Dobrodošli u igru Skocko! Potrebno je pogoditi kombinaciju 4 simbola(H, T, P, K, S, Z) imate 6 pokusaja";
+                Console.WriteLine(porukaSkocko);
+                for (int i = 1; i <= 6; i++)
+                {
+                    
+                    Console.Write($"pokusaj {i}:");
+                    p1 = Console.ReadLine();
+                
+                        
+                    tcpPisanje.PosaljiPoruku(tcpSocket, p1);
+                    p2 = tcpCitanje.ProcitajPoruku(tcpSocket);
+                    Console.WriteLine(p2);
+                    if (p2.Contains("GRESKA"))
+                    {
+                        i--;
+                        continue;
+                    }
+                    
+                    if (p2.Contains("Čestitamo"))
+                    {
+                        break;
+                    }
+                }
+                string p3 = tcpCitanje.ProcitajPoruku(tcpSocket);
+                Console.WriteLine(p3);
+
+            }
+            #endregion
+
+
+            #region koznazna
+            if (igre.Contains("kzz"))
+            {
+                string p1, p2, p3;
+                string porukaKoZnaZna = "Dobrodošli u igru Ko zna zna! odgovarate na 5 pitanja upisivanjem rednog broja(TACAN ODGOVOR=10 poena NETACAN=-5 poena";
+                Console.WriteLine(porukaKoZnaZna);
+                for (int i = 1; i <= 5; i++)
+                {
+                    p1 = tcpCitanje.ProcitajPoruku(tcpSocket);
+                    Console.WriteLine(p1);
+                    p2 = Console.ReadLine();
+                    tcpPisanje.PosaljiPoruku(tcpSocket, p2);
+                    p3 = tcpCitanje.ProcitajPoruku(tcpSocket);
+                    Console.WriteLine(p3);
+                }
+                string p4 = tcpCitanje.ProcitajPoruku(tcpSocket);
+                Console.WriteLine(p4);
+            }
+
+            #endregion
+
+
+            #region kraj
+            string suma = tcpCitanje.ProcitajPoruku(tcpSocket);
+            Console.WriteLine(suma);
 
             Console.ReadLine();
 
             tcpSocket.Close();
             udpSocket.Close();
+            #endregion
 
         }
     }

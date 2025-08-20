@@ -31,9 +31,9 @@ namespace Server
         }
 
         // Provera pokušaja → vraća opis i broj poena
-        public (string opis, int poeni) ProveriKombinaciju(string pokusaj, int redniPokusaj)
+        public (string opis, int poeni) ProveriKombinaciju(int redniPokusaj)
         {
-            TekućaKombinacija = pokusaj.ToUpper();
+            TekućaKombinacija = TekućaKombinacija.ToUpper();
 
             int naMestu = 0;
             int uKombinaciji = 0;
@@ -69,12 +69,13 @@ namespace Server
                 }
             }
 
-            
 
-            // bodovi
+
+            string opis;
             int poeni = 0;
             if (naMestu == 4)
             {
+              opis="Čestitamo! Pogodili ste kombinaciju!";
                 switch (redniPokusaj)
                 {
                     case 1: poeni = 30; break;
@@ -84,9 +85,13 @@ namespace Server
                     case 5: poeni = 10; break;
                     case 6: poeni = 10; break;
                 }
+
+            }
+            else {
+                opis = $"{naMestu} na mestu, {uKombinaciji} u kombinaciji ali nisu na mestu";
             }
 
-            string opis = $"{naMestu} na mestu, {uKombinaciji} u kombinaciji ali nisu na mestu";
+                
 
             return (opis, poeni);
         }

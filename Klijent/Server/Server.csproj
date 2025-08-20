@@ -43,8 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KoZnaZna.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="servisi\Provera.cs" />
     <Compile Include="Skocko.cs" />
     <Compile Include="Slagalica.cs" />
   </ItemGroup>
@@ -60,6 +62,9 @@
       <Project>{7cf24fe8-f8a6-489c-bd68-e097961f0a96}</Project>
       <Name>Services</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="igre\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

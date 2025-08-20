@@ -44,7 +44,7 @@ namespace Server
         public int ProveriReč()
         {
             List<char> slovaPonudjena = PonuđenaSlova.ToUpper().ToList();
-
+            SastavljenaReč = SastavljenaReč.ToUpper();
             foreach (char c in SastavljenaReč)
             {
                 if (slovaPonudjena.Contains(c))
